@@ -1,0 +1,143 @@
+#---------------------------------------------------#
+# Clash 配置文件模板
+# 适用于 Clash Meta / Clash Verge
+#---------------------------------------------------#
+
+port: 7890
+socks-port: 7891
+redir-port: 7892
+allow-lan: true
+mode: Rule
+log-level: info
+external-controller: 127.0.0.1:9090
+external-ui: ui
+
+# ----------------------------------------------------
+# 代理节点（方式一：直接配置）
+# ----------------------------------------------------
+proxies:
+  # 示例节点，替换为你自己的
+  # - name: "🇭🇰 HK-01"
+  #   type: vmess
+  #   server: example.com
+  #   port: 443
+  #   uuid: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+  #   alterId: 0
+  #   cipher: auto
+  #   tls: true
+  #   network: ws
+  #   ws-opts:
+  #     path: /
+  #     headers:
+  #       Host: example.com
+
+# ----------------------------------------------------
+# 代理节点（方式二：订阅链接 - 推荐）
+# ----------------------------------------------------
+proxy-providers:
+  Provider:
+    type: http
+    url: "https://example.com/sub?target=clash"  # 替换为你的订阅链接
+    interval: 86400
+    path: ./proxy_provider.yaml
+    health-check:
+      enable: true
+      url: http://www.gstatic.com/generate_204
+      interval: 300
+
+# ----------------------------------------------------
+# 代理组
+# ----------------------------------------------------
+proxy-groups:
+  - name: 🚀 自动选择
+    type: url-test
+    proxies:
+      - ♻️ 自动选择
+      - DIRECT
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+
+  - name: ♻️ 自动选择
+    type: fallback
+    use:
+      - Provider
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+
+  - name: 🌍 国外流量
+    type: select
+    proxies:
+      - 🚀 自动选择
+      - ♻️ 自动选择
+      - DIRECT
+
+  - name: 🎯 全球直连
+    type: select
+    proxies:
+      - DIRECT
+      - 🚀 自动选择
+
+  - name: 🐟 漏网之鱼
+    type: select
+    proxies:
+      - 🚀 自动选择
+      - ♻️ 自动选择
+      - DIRECT
+
+# ----------------------------------------------------
+# 规则
+# ----------------------------------------------------
+rules:
+  # === 去广告 ===
+  - DOMAIN-SUFFIX,adservice.google.com,🎯 全球直连
+  - DOMAIN-SUFFIX,doubleclick.net,🎯 全球直连
+
+  # === AI 服务（走代理，速度快）===
+  - DOMAIN-SUFFIX,openai.com,🌍 国外流量
+  - DOMAIN-SUFFIX,chatgpt.com,🌍 国外流量
+  - DOMAIN-SUFFIX,claude.ai,🌍 国外流量
+  - DOMAIN-SUFFIX,anthropic.com,🌍 国外流量
+  - DOMAIN-SUFFIX,bing.com,🌍 国外流量
+  - DOMAIN-SUFFIX,copilot.microsoft.com,🌍 国外流量
+
+  # === 流媒体 ===
+  - DOMAIN-SUFFIX,youtube.com,🌍 国外流量
+  - DOMAIN-SUFFIX,googlevideo.com,🌍 国外流量
+  - DOMAIN-SUFFIX,netflix.com,🌍 国外流量
+  - DOMAIN-SUFFIX,spotify.com,🌍 国外流量
+  - DOMAIN-SUFFIX,twitter.com,🌍 国外流量
+  - DOMAIN-SUFFIX,x.com,🌍 国外流量
+  - DOMAIN-SUFFIX,instagram.com,🌍 国外流量
+
+  # === 开发/技术 ===
+  - DOMAIN-SUFFIX,github.com,🌍 国外流量
+  - DOMAIN-SUFFIX,github.io,🌍 国外流量
+  - DOMAIN-SUFFIX,gitlab.com,🌍 国外流量
+  - DOMAIN-SUFFIX,docker.com,🌍 国外流量
+  - DOMAIN-SUFFIX,stackoverflow.com,🌍 国外流量
+  - DOMAIN-SUFFIX,pypi.org,🌍 国外流量
+  - DOMAIN-SUFFIX,npmjs.org,🌍 国外流量
+  - DOMAIN-SUFFIX,python.org,🌍 国外流量
+
+  # === 国内网站（直连）===
+  - DOMAIN-SUFFIX,baidu.com,🎯 全球直连
+  - DOMAIN-SUFFIX,qq.com,🎯 全球直连
+  - DOMAIN-SUFFIX,taobao.com,🎯 全球直连
+  - DOMAIN-SUFFIX,jd.com,🎯 全球直连
+  - DOMAIN-SUFFIX,zhihu.com,🎯 全球直连
+  - DOMAIN-SUFFIX,bilibili.com,🎯 全球直连
+  - DOMAIN-SUFFIX,weibo.com,🎯 全球直连
+  - DOMAIN-SUFFIX,douyin.com,🎯 全球直连
+
+  # === 内网/系统 ===
+  - IP-CIDR,10.0.0.0/8,🎯 全球直连
+  - IP-CIDR,172.16.0.0/12,🎯 全球直连
+  - IP-CIDR,192.168.0.0/16,🎯 全球直连
+  - IP-CIDR,127.0.0.0/8,🎯 全球直连
+  - IP-CIDR,224.0.0.0/4,🎯 全球直连
+  - IP-CIDR6,::1/128,🎯 全球直连
+  - IP-CIDR6,fc00::/7,🎯 全球直连
+  - IP-CIDR6,fe80::/7,🎯 全球直连
+
+  # === 漏网之鱼 ===
+  - MATCH,🐟 漏网之鱼
