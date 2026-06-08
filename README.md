@@ -35,3 +35,12 @@ clash -f config.yaml
 ---
 
 > 有问题请联系: **caizhenwei33@gmail.com**
+
+## ☕ 支持 / Support
+
+如果这个教程对你有帮助，欢迎请我喝杯咖啡：
+
+**USDT (TRC20)**
+```
+TVbQerV1SF4MXB1JCcAzQxarewHwEPYTKm
+```
